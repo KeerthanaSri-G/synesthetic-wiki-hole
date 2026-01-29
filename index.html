@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synesthetic Wiki-Hole</title>
+    <style>
+        /* Modern, clean styling */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            background-color: #f8f9fa; 
+            margin: 0; 
+            transition: background-color 1.5s ease; /* Smooth color transition */
+        }
+
+        .container { 
+            text-align: center; 
+            background: rgba(255, 255, 255, 0.9); 
+            padding: 3rem; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+            max-width: 500px;
+        }
+
+        h1 { color: #333; margin-bottom: 0.5rem; }
+        p { color: #666; margin-bottom: 2rem; }
+
+        .button-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+        button { 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: #333;
+            color: white;
+        }
+
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+        }
+
+        #result { 
+            margin-top: 30px; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee;
+            min-height: 100px;
+        }
+
+        .wiki-link { 
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .color-tag {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #888;
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Wiki-Hole</h1>
+    <p>Select a mood to generate a unique visual and educational reality.</p>
+    
+    <div class="button-group">
+        <button onclick="getWiki('Aesthetics')">Aesthetic</button>
+        <button onclick="getWiki('Unsolved_mysteries')">Mysterious</button>
+        <button onclick="getWiki('Artificial_intelligence')">Future</button>
+        <button onclick="getWiki('Nature')">Calm</button>
+    </div>
+
+    <div id="result">
+        <p>Waiting for your input...</p>
+    </div>
+</div>
+
+<script>
+    async function getWiki(category) {
+        const resultDiv = document.getElementById('result');
+        const body = document.body;
+        resultDiv.innerHTML = "<em>Analyzing data patterns...</em>";
+
+        try {
+            // Fetching data from Wikipedia API
+            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&list=categorymembers&cmtitle=Category:${category}&cmlimit=50`;
+            
+            const response = await fetch(url);
+            const data = await response.json();
+            const pages = data.query.categorymembers;
+            
+            // Safety check if no pages found
+            if (!pages || pages.length === 0) {
+                resultDiv.innerHTML = "No pages found in this category.";
+                return;
+            }
+
+            const randomPage = pages[Math.floor(Math.random() * pages.length)];
+            const title = randomPage.title;
+
+            // --- UNIQUE FEATURE: SYNESTHESIA ALGORITHM ---
+            // This converts the text string into a specific HSL color
+            let hash = 0;
+            for (let i = 0; i < title.length; i++) {
+                hash = title.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            // Hue is based on hash, Saturation 60%, Lightness 80% (for pastels)
+            const uniqueColor = `hsl(${Math.abs(hash) % 360}, 60%, 80%)`; 
+            
+            // Apply the unique color to the background
+            body.style.backgroundColor = uniqueColor;
+            
+            resultDiv.innerHTML = `
+                <span class="color-tag">Data Signature: ${uniqueColor}</span>
+                <h3 style="margin: 10px 0;">${title}</h3>
+                <a href="https://en.wikipedia.org/?curid=${randomPage.pageid}" target="_blank" class="wiki-link">Explore Article</a>
+            `;
+        } catch (error) {
+            console.error(error);
+            resultDiv.innerHTML = "Connection lost. Please try again.";
+        }
+    }
+</script>
+
+</body>
+</html>
